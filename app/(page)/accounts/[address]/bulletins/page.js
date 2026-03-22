@@ -1,0 +1,46 @@
+
+import Pagination from "@/components/Pagination"
+import Timestamp from "@/components/Timestamp"
+import Account from "@/components/Account"
+import LinkBulletin from "@/components/LinkBulletin"
+import Avatar from "@/components/Avatar"
+import getAccountBulletinsData from "@/lib/data/account_bulletins"
+
+export default async function Page(props) {
+  let page_cursor = 1
+  if (props.searchParams.page && props.searchParams.page > 1) {
+    page_cursor = props.searchParams.page
+  }
+  const { bulletins, bulletin_size } = await getAccountBulletinsData({ address: props.params.address, page: page_cursor })
+
+  return (
+    <div>
+      <div className="flex flex-row">
+        <div className="flex-none">
+          <Avatar str={props.params.address} size={50} />
+        </div>
+        <div className="flex flex-col">
+          Bulletins#<Account address={props.params.address} />
+        </div>
+      </div>
+      <ul>
+        {bulletins.map((bulletin) => (
+          <li key={bulletin.hash} className="py-1">
+            <div className="flex flex-col">
+              <div>
+                <LinkBulletin hash={bulletin.hash} str={`#${bulletin.sequence}`} />
+                <Timestamp timestamp={bulletin.signed_at} />
+              </div>
+              <div>
+                <span>
+                  {bulletin.content}
+                </span>
+              </div>
+            </div>
+          </li>
+        ))}
+      </ul>
+      <Pagination url={`/accounts/${props.params.address}/bulletins`} page_size={bulletin_size} page_cursor={page_cursor}></Pagination>
+    </div>
+  )
+}

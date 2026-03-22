@@ -1,0 +1,60 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Avatar {
+  address    String  @id
+  hash       String
+  size       Int
+  json       String
+  signed_at  BigInt
+  is_saved   Boolean @default(false) 
+}
+
+model Bulletin {
+  hash       String  @id
+  address    String
+  sequence   Int
+  content    String
+  json       String
+  signed_at  BigInt
+  created_at BigInt
+  pre_hash   String
+  next_hash  String?
+
+  tags       Tag[]
+  files       File[]
+}
+
+model Tag {
+  name      String  @id
+  bulletins Bulletin[]
+}
+
+model File {
+  hash         String  @id
+  size         Int
+  chunk_length Int
+  chunk_cursor Int
+  updated_at   BigInt
+  is_saved     Boolean @default(false) 
+
+  bulletins    Bulletin[]
+}
+
+model Reply {
+  post_hash  String
+  reply_hash String
+  signed_at  BigInt
+
+  @@id([post_hash, reply_hash])
+}
