@@ -14,5 +14,14 @@ npm run dev
 3.
 ```
 npm run build
+npm run start
+```
+or
+```
+npm install -g pm2
+npm run build
 pm2 start npx --name web -- next start -p 3000
+pm2 save
+crontab -e
+0 3 * * * cd /your/path/to/site && npm run build && pm2 reload web --update-env
 ```
