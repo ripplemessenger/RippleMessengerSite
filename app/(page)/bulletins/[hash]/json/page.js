@@ -10,7 +10,9 @@ export default async function Page(props) {
 
   return (
     <div className='break-all'>
-      {bulletin.json}
+      <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-auto whitespace-pre-wrap break-words font-mono text-sm max-w-full">
+        {bulletin.json}
+      </pre>
     </div>
   )
 }
