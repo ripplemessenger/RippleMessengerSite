@@ -1,0 +1,29 @@
+User-agent: *
+Allow: /
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Baiduspider
+Allow: /
+
+User-agent: Yandex
+Allow: /
+
+Disallow: /admin/
+Disallow: /login/
+Disallow: /register/
+Disallow: /temp/
+Disallow: /cache/
+Disallow: /backup/
+
+Disallow: /*?*
+Disallow: /*&*
+
+# Disallow: /images/
+# Disallow: /uploads/
+
+Sitemap: https://ripplemessenger.com/sitemap.xml
