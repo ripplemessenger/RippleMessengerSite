@@ -89,20 +89,28 @@ export default async function Page(props) {
             </div>
           )}
           <hr className="border-gray-300 dark:border-gray-600" />
-          {(videos.length > 0 || audios.length > 0) && (
+          {(videos.length > 0 || audios.length > 0 || images.length > 0) && (
             <div className="flex flex-col gap-2">
+              {images.map((file) => (
+                <div key={file.Hash} className="flex items-center gap-3 bg-gray-100 dark:bg-gray-800 rounded-lg p-3">
+                  <div className="text-2xl">🖼</div>
+                  <div className="flex-1">
+                    <div className="font-bold">{file.Name || '图片'}{file.Ext ? `.${file.Ext}` : ''}</div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400">{file.Size != null ? (file.Size / 1024 / 1024).toFixed(1) + ' MB' : ''}</div>
+                  </div>
+                  <Link
+                    href={`https://github.com/ripplemessenger/RippleMessengerClient/releases`}
+                    className="bg-blue-500 hover:bg-blue-600 text-white font-bold px-4 py-2 rounded-lg text-sm whitespace-nowrap"
+                  >
+                    在 Client 中查看
+                  </Link>
+                </div>
+              ))}
               {videos.map((file) => (
                 <div key={file.Hash} className="flex items-center gap-3 bg-black/80 text-white rounded-lg p-3">
-                  {images.length > 0 && (
-                    <img
-                      src={`/file/${images[0].Hash}`}
-                      alt=""
-                      className="h-16 w-28 object-cover rounded"
-                      loading="lazy"
-                    />
-                  )}
+                  <div className="text-2xl">▶</div>
                   <div className="flex-1">
-                    <div className="font-bold">▶ {file.Name || '视频'}{file.Ext ? `.${file.Ext}` : ''}</div>
+                    <div className="font-bold">{file.Name || '视频'}{file.Ext ? `.${file.Ext}` : ''}</div>
                     <div className="text-sm text-gray-400">{file.Size != null ? (file.Size / 1024 / 1024).toFixed(1) + ' MB' : ''}</div>
                   </div>
                   <Link
@@ -127,19 +135,6 @@ export default async function Page(props) {
                     在 Client 中播放
                   </Link>
                 </div>
-              ))}
-            </div>
-          )}
-          {images.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {images.map((file) => (
-                <img
-                  key={file.Hash}
-                  src={`/file/${file.Hash}`}
-                  alt={file.Name}
-                  className="max-w-full max-h-96 rounded-lg"
-                  loading="lazy"
-                />
               ))}
             </div>
           )}

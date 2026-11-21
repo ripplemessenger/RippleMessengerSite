@@ -32,29 +32,28 @@ export default async function Page(props) {
                     <LinkBulletin hash={bulletin.hash} str={`#${bulletin.sequence}`} />
                     <Timestamp timestamp={bulletin.signed_at} />
                   </div>
-                  <div className="flex flex-row items-start gap-2">
-                    <span className="text-sm text-gray-700 dark:text-gray-300 break-words">
-                      {bulletin.content}
-                    </span>
-                    {media.image && (
-                      <img
-                        src={`/file/${media.image}`}
-                        alt=""
-                        className="h-12 w-12 object-cover rounded"
-                        loading="lazy"
-                      />
-                    )}
-                    {media.video && (
-                      <span className="inline-flex items-center gap-0.5 text-xs bg-black/70 text-white rounded px-1.5 py-0.5">
-                        ▶ 视频
-                      </span>
-                    )}
-                    {media.audio && (
-                      <span className="inline-flex items-center gap-0.5 text-xs bg-black/70 text-white rounded px-1.5 py-0.5">
-                        ♪ 音频
-                      </span>
-                    )}
-                  </div>
+                  <span className="text-sm text-gray-700 dark:text-gray-300 break-words">
+                    {bulletin.content}
+                  </span>
+                  {(media.image || media.video || media.audio) && (
+                    <div className="flex gap-1">
+                      {media.image && (
+                        <span className="inline-flex items-center text-xs bg-gray-200 dark:bg-gray-700 rounded px-1.5 py-0.5">
+                          🖼 图片
+                        </span>
+                      )}
+                      {media.video && (
+                        <span className="inline-flex items-center text-xs bg-black/70 text-white rounded px-1.5 py-0.5">
+                          ▶ 视频
+                        </span>
+                      )}
+                      {media.audio && (
+                        <span className="inline-flex items-center text-xs bg-black/70 text-white rounded px-1.5 py-0.5">
+                          ♪ 音频
+                        </span>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             </li>
