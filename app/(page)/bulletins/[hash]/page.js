@@ -1,12 +1,9 @@
-// 'use client'
-
 import Link from "next/link"
 import { notFound } from 'next/navigation'
 import Account from "@/components/Account"
 import LinkBulletin from "@/components/LinkBulletin"
 import Avatar from "@/components/Avatar"
 import Timestamp from "@/components/Timestamp"
-import QRCode from "@/components/QRCode"
 import Pagination from "@/components/Pagination"
 import getBulletinData from "@/lib/data/bulletin"
 
@@ -20,25 +17,12 @@ export default async function Page(props) {
   if (!bulletin) {
     notFound()
   }
-  if (!bulletin.file) {
-    bulletin['file'] = '[]'
-  }
 
   let json = JSON.parse(bulletin.json)
-  let tags = []
-  if (json.Tag) {
-    tags = json.Tag
-  }
-  let quotes = []
-  if (json.Quote) {
-    quotes = json.Quote
-  }
-  let files = []
-  if (json.File) {
-    files = json.File
-  }
+  let tags = json.Tag || []
+  let quotes = json.Quote || []
+  let files = json.File || []
 
-  // Split attachments by type for the main media display.
   const IMG_EXT = /^(jpg|jpeg|png|gif|webp|svg|bmp)$/i
   const VID_EXT = /^(mp4|webm|mov|m4v)$/i
   const AUD_EXT = /^(mp3|ogg|oga|opus|wav|m4a|aac|flac)$/i
@@ -46,103 +30,108 @@ export default async function Page(props) {
   const videos = files.filter((f) => VID_EXT.test(f.Ext))
   const audios = files.filter((f) => AUD_EXT.test(f.Ext))
 
-  // let pk = JSON.parse(bulletin.json).PublicKey
-  // let qr_json = {
-  //   "Relay": process.env.BASE_URL,
-  //   "PublicKey": pk
-  // }
-  // let qrcode = JSON.stringify(qr_json)
-
   return (
-    <div>
-      <div className="flex flex-row">
+    <article className="space-y-4">
+      <div className="flex flex-row gap-3">
         <div className="flex-none">
           <Avatar str={bulletin.address} size={50} />
         </div>
-        <div className="flex flex-col">
+        <div className="flex flex-col gap-2 min-w-0 flex-1">
           <div>
-            <Link href={`/bulletins/${bulletin.hash}/json`} className="inline font-bold bg-blue-500 px-2 rounded-lg">Bulletin#{bulletin.hash}</Link>
+            <Link href={`/bulletins/${bulletin.hash}/json`} className="inline font-bold bg-blue-500 px-2 rounded-lg text-white">
+              Bulletin#{bulletin.hash}
+            </Link>
             <br />
             <Account address={bulletin.address} />
             <LinkBulletin hash={bulletin.hash} str={`#${bulletin.sequence}`} />
             <br />
             <Timestamp timestamp={bulletin.signed_at} />
           </div>
-          <div>
-            {
-              bulletin.sequence != 1 ?
-                <Link href={`/bulletins/${bulletin.pre_hash}`} className='inline font-bold bg-yellow-500 rounded-md px-0.5'>上一篇</Link> : <></>
-            }
-            {
-              next ?
-                <Link href={`/bulletins/${next.hash}`} className='inline font-bold bg-yellow-500 rounded-md px-0.5'>下一篇</Link> : <></>
-            }
+          <div className="flex gap-2">
+            {bulletin.sequence !== 1 && (
+              <Link href={`/bulletins/${bulletin.pre_hash}`} className='inline font-bold bg-yellow-500 rounded-md px-1'>上一篇</Link>
+            )}
+            {next && (
+              <Link href={`/bulletins/${next.hash}`} className='inline font-bold bg-yellow-500 rounded-md px-1'>下一篇</Link>
+            )}
           </div>
-          {
-            tags.length > 0 ?
-              <div className="flex flex-wrap">
-                Tag: {tags.map((tag) => (
-                  <div className="inline" key={tag}>
-                    <Link href={`#`} className='font-bold bg-gray-300 rounded-md px-1'>#{tag}</Link>
-                  </div>
-                ))}
-              </div> : <></>
-          }
-          {
-            quotes.length > 0 ?
-              <div className="flex flex-wrap">
-                Quote: {quotes.map((quote) => (
-                  <div className="inline" key={quote.Hash}>
-                    <Link href={`/bulletins/${quote.Hash}`} className='font-bold bg-yellow-500 rounded-md px-1'>{quote.Address}#{quote.Sequence}</Link>
-                  </div>
-                ))}
-              </div> : <></>
-          }
-          {
-            // Files: show the list but guide users to the Client for downloading.
-            files.length > 0 ?
-              <div className="flex flex-col gap-1">
-                <div className="flex flex-wrap">
-                  File: {files.map((file) => (
-                    <div className="inline" key={file.Hash}>
-                      <span className='font-bold bg-gray-300 rounded-md px-1'>{(file.Name || 'unnamed').replace(/\.$/, '')}{file.Ext ? `.${file.Ext}` : ''} ({file.Size != null ? file.Size : '?'})</span>
-                    </div>
-                  ))}
-                </div>
-                <div className="text-sm text-gray-500">
-                  请使用 <Link href={`https://github.com/ripplemessenger/RippleMessengerClient/releases`} className="font-bold text-blue-500 hover:underline">RippleMessenger Client</Link> 下载文件
-                </div>
-              </div> : <></>
-          }
-          <hr />
-          {videos.length > 0 && (
-            <div className="mb-4">
-              {videos.map((file) => (
-                <video
-                  key={file.Hash}
-                  controls
-                  className="max-w-full rounded-lg"
-                  src={`/file/${file.Hash}`}
-                  poster={images.length > 0 ? `/file/${images[0].Hash}` : undefined}
-                />
+          {tags.length > 0 && (
+            <div className="flex flex-wrap gap-1">
+              <span className="text-sm">Tag:</span>
+              {tags.map((tag) => (
+                <span key={tag} className='font-bold bg-gray-300 dark:bg-gray-600 rounded-md px-1 text-sm'>#{tag}</span>
               ))}
             </div>
           )}
-          {audios.length > 0 && (
-            <div className="mb-4 flex flex-col gap-2">
+          {quotes.length > 0 && (
+            <div className="flex flex-wrap gap-1">
+              <span className="text-sm">Quote:</span>
+              {quotes.map((quote) => (
+                <Link key={quote.Hash} href={`/bulletins/${quote.Hash}`} className='font-bold bg-yellow-500 rounded-md px-1 text-sm'>
+                  {quote.Address}#{quote.Sequence}
+                </Link>
+              ))}
+            </div>
+          )}
+          {files.length > 0 && (
+            <div className="flex flex-col gap-1">
+              <div className="flex flex-wrap gap-1">
+                <span className="text-sm">File:</span>
+                {files.map((file) => (
+                  <span key={file.Hash} className='font-bold bg-gray-300 dark:bg-gray-600 rounded-md px-1 text-sm'>
+                    {(file.Name || 'unnamed').replace(/\.$/, '')}{file.Ext ? `.${file.Ext}` : ''} ({file.Size != null ? file.Size : '?'})
+                  </span>
+                ))}
+              </div>
+              <div className="text-sm text-gray-500 dark:text-gray-400">
+                请使用 <Link href={`https://github.com/ripplemessenger/RippleMessengerClient/releases`} className="font-bold text-blue-500 hover:underline">RippleMessenger Client</Link> 下载文件
+              </div>
+            </div>
+          )}
+          <hr className="border-gray-300 dark:border-gray-600" />
+          {(videos.length > 0 || audios.length > 0) && (
+            <div className="flex flex-col gap-2">
+              {videos.map((file) => (
+                <div key={file.Hash} className="flex items-center gap-3 bg-black/80 text-white rounded-lg p-3">
+                  {images.length > 0 && (
+                    <img
+                      src={`/file/${images[0].Hash}`}
+                      alt=""
+                      className="h-16 w-28 object-cover rounded"
+                      loading="lazy"
+                    />
+                  )}
+                  <div className="flex-1">
+                    <div className="font-bold">▶ {file.Name || '视频'}{file.Ext ? `.${file.Ext}` : ''}</div>
+                    <div className="text-sm text-gray-400">{file.Size != null ? (file.Size / 1024 / 1024).toFixed(1) + ' MB' : ''}</div>
+                  </div>
+                  <Link
+                    href={`https://github.com/ripplemessenger/RippleMessengerClient/releases`}
+                    className="bg-blue-500 hover:bg-blue-600 text-white font-bold px-4 py-2 rounded-lg text-sm whitespace-nowrap"
+                  >
+                    在 Client 中播放
+                  </Link>
+                </div>
+              ))}
               {audios.map((file) => (
-                <audio
-                  key={file.Hash}
-                  controls
-                  className="w-full"
-                  src={`/file/${file.Hash}`}
-                  preload="metadata"
-                />
+                <div key={file.Hash} className="flex items-center gap-3 bg-black/80 text-white rounded-lg p-3">
+                  <div className="text-2xl">♪</div>
+                  <div className="flex-1">
+                    <div className="font-bold">{file.Name || '音频'}{file.Ext ? `.${file.Ext}` : ''}</div>
+                    <div className="text-sm text-gray-400">{file.Size != null ? (file.Size / 1024 / 1024).toFixed(1) + ' MB' : ''}</div>
+                  </div>
+                  <Link
+                    href={`https://github.com/ripplemessenger/RippleMessengerClient/releases`}
+                    className="bg-blue-500 hover:bg-blue-600 text-white font-bold px-4 py-2 rounded-lg text-sm whitespace-nowrap"
+                  >
+                    在 Client 中播放
+                  </Link>
+                </div>
               ))}
             </div>
           )}
           {images.length > 0 && (
-            <div className="mb-4 flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2">
               {images.map((file) => (
                 <img
                   key={file.Hash}
@@ -154,37 +143,36 @@ export default async function Page(props) {
               ))}
             </div>
           )}
-          <div dangerouslySetInnerHTML={{ __html: bulletin.content.replace(/\n/g, "<br>") }} className="break-all"></div>
-        </div>
-        <div className="flex flex-col">
-          {/* <QRCode content={qrcode} /> */}
+          <div dangerouslySetInnerHTML={{ __html: bulletin.content.replace(/\n/g, "<br>") }} className="break-words"></div>
         </div>
       </div>
-      <div>
-        <ul>
-          {replys.map((reply) => (
-            <li key={reply.hash} >
-              <hr />
-              <div className="flex flex-row">
-                <div className="flex-none">
-                  <Avatar str={reply.address} size={50} />
-                </div>
-                <div className="flex flex-col">
-                  <div>
-                    <Account address={reply.address} />
-                    <LinkBulletin hash={reply.hash} str={`#${reply.sequence}`} />
-                    <Timestamp timestamp={reply.signed_at} />
+
+      {replys.length > 0 && (
+        <section className="mt-6">
+          <h3 className="text-lg font-bold mb-3">回复 ({reply_size})</h3>
+          <ul className="space-y-3">
+            {replys.map((reply) => (
+              <li key={reply.hash} className="border-t border-gray-300 dark:border-gray-600 pt-3">
+                <div className="flex flex-row gap-3">
+                  <div className="flex-none">
+                    <Avatar str={reply.address} size={50} />
                   </div>
-                  <div>
-                    <div dangerouslySetInnerHTML={{ __html: reply.content.replace(/\n/g, "<br>") }} className="break-all"></div>
+                  <div className="flex flex-col gap-1 min-w-0">
+                    <div>
+                      <Account address={reply.address} />
+                      <LinkBulletin hash={reply.hash} str={`#${reply.sequence}`} />
+                      <Timestamp timestamp={reply.signed_at} />
+                    </div>
+                    <div dangerouslySetInnerHTML={{ __html: reply.content.replace(/\n/g, "<br>") }} className="break-words text-sm"></div>
                   </div>
                 </div>
-              </div>
-            </li>
-          ))}
-        </ul>
-      </div >
-      <Pagination url={`/bulletins/${bulletin.hash}`} page_size={reply_size} page_cursor={page_cursor}></Pagination>
-    </div>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      <Pagination url={`/bulletins/${bulletin.hash}`} page_size={reply_size} page_cursor={page_cursor} />
+    </article>
   )
 }

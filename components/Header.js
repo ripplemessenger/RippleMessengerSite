@@ -1,35 +1,28 @@
 import Link from "next/link"
-import React from "react"
 import DarkMode from "./DarkMode"
+
+const navItems = [
+  { href: '/', label: '首页' },
+  { href: '/bulletins', label: '帖子' },
+  { href: '/accounts', label: '账号' },
+  { href: '/about', label: '关于' },
+]
 
 export default function Header() {
   return (
-    <div className="flex justify-between">
-      <div className="">
-        <Link href={`/`} className="font-bold text-4xl text-gray-800 hover:text-gray-500">首页</Link>
-      </div>
-      <div className="">
-        <Link href={`/bulletins`} className="font-bold text-4xl text-gray-800 hover:text-gray-500">帖子</Link>
-      </div>
-      <div className="">
-        <Link href={`/accounts`} className="font-bold text-4xl text-gray-800 hover:text-gray-500">账号</Link>
-      </div>
-      <div className="">
-        <Link href={`/about`} className="font-bold text-4xl text-gray-800 hover:text-gray-500">关于</Link>
-      </div>
-      <div className="">
-      </div>
-      <div className="">
-      </div>
-      <div className="">
-      </div>
-      <div className="">
-      </div>
-      <div className="">
-      </div>
-      <div className="">
+    <nav className="flex items-center justify-between py-3 mb-4 border-b border-gray-300 dark:border-gray-600">
+      <div className="flex items-center gap-4">
+        {navItems.map((item) => (
+          <Link
+            key={item.href}
+            href={item.href}
+            className="font-bold text-lg text-gray-800 hover:text-gray-500 dark:text-gray-200 dark:hover:text-gray-400 transition-colors"
+          >
+            {item.label}
+          </Link>
+        ))}
       </div>
       <DarkMode />
-    </div>
+    </nav>
   )
 }

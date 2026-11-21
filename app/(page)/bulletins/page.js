@@ -13,28 +13,27 @@ export default async function Page(props) {
   }
   const { bulletins, bulletin_size } = await getBulletinsData({ page: page_cursor })
 
-  // First image / first video per bulletin, for thumbnails + badges.
   const mediaMap = await getMediaFiles(bulletins.map((b) => b.hash))
 
   return (
-    <div>
-      <ul>
+    <div className="space-y-2">
+      <ul className="space-y-1">
         {bulletins.map((bulletin) => {
           const media = mediaMap[bulletin.hash] || { image: null, video: null, audio: null }
           return (
-            <li key={bulletin.hash} className="py-1">
-              <div className="flex flex-row">
+            <li key={bulletin.hash} className="py-2">
+              <div className="flex flex-row gap-3">
                 <div className="flex-none">
                   <Avatar str={bulletin.address} size={50} />
                 </div>
-                <div className="flex flex-col">
+                <div className="flex flex-col gap-1 min-w-0">
                   <div>
                     <Account address={bulletin.address} />
                     <LinkBulletin hash={bulletin.hash} str={`#${bulletin.sequence}`} />
                     <Timestamp timestamp={bulletin.signed_at} />
                   </div>
                   <div className="flex flex-row items-start gap-2">
-                    <span className="">
+                    <span className="text-sm text-gray-700 dark:text-gray-300 break-words">
                       {bulletin.content}
                     </span>
                     {media.image && (
@@ -62,7 +61,7 @@ export default async function Page(props) {
           )
         })}
       </ul>
-      <Pagination url={`/bulletins`} page_size={bulletin_size} page_cursor={page_cursor}></Pagination>
-    </div >
+      <Pagination url={`/bulletins`} page_size={bulletin_size} page_cursor={page_cursor} />
+    </div>
   )
 }

@@ -1,47 +1,41 @@
 'use client'
 
-import React from "react"
-import { useState, useEffect } from "react"
-import Image from "next/image"
+import React, { useState, useEffect, useCallback } from 'react'
+import Image from 'next/image'
 
 export default function DarkMode() {
-  const [theme, setTheme] = useState("light")
-  function getThemeFromLocalStorage() {
-    const savedTheme = localStorage.getItem("theme")
-    if (savedTheme) {
-      setTheme(savedTheme)
-      if (savedTheme == 'dark') {
-        document.getElementsByTagName("HTML")[0].classList.add('dark')
+  const [theme, setTheme] = useState('light')
+
+  useEffect(() => {
+    const saved = localStorage.getItem('theme')
+    if (saved) {
+      setTheme(saved)
+      if (saved === 'dark') {
+        document.documentElement.classList.add('dark')
       }
     }
-  }
-  function toggleTheme() {
-    setTheme((theme) => {
-      let newTheme = ''
-      if (theme != 'light') {
-        newTheme = 'light'
-        document.getElementsByTagName("HTML")[0].classList.remove('dark')
+  }, [])
+
+  const toggleTheme = useCallback(() => {
+    setTheme((prev) => {
+      const next = prev === 'dark' ? 'light' : 'dark'
+      if (next === 'dark') {
+        document.documentElement.classList.add('dark')
       } else {
-        newTheme = 'dark'
-        document.getElementsByTagName("HTML")[0].classList.add('dark')
+        document.documentElement.classList.remove('dark')
       }
-      setTheme(newTheme)
-      localStorage.setItem("theme", newTheme)
-      return newTheme
+      localStorage.setItem('theme', next)
+      return next
     })
-  }
-  useEffect(() => {
-    getThemeFromLocalStorage()
-  }, [theme])
+  }, [])
 
   return (
-    <div className="order-last">
-      {theme == 'dark' ?
-        <button onClick={toggleTheme}><Image src="/assets/mode_light.png" width={61} height={46} alt="light_mode"/></button>
-        :
-        <button onClick={toggleTheme}><Image src="/assets/mode_dark.png" width={61} height={46} alt="dark_mode"/></button>
+    <button onClick={toggleTheme} aria-label="切换主题" className="ml-2">
+      {theme === 'dark'
+        ? <Image src="/assets/mode_light.png" width={40} height={30} alt="切换到亮色" />
+        : <Image src="/assets/mode_dark.png" width={40} height={30} alt="切换到暗色" />
       }
-    </div>
+    </button>
   )
 }
 
