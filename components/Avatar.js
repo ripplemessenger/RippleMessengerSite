@@ -1,10 +1,22 @@
 'use client'
 
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
 
 export default function Avatar({ str, size }) {
+  const [src, setSrc] = useState(`/avatar/${str}`)
+
+  useEffect(() => {
+    setSrc(`/avatar/${str}`)
+  }, [str])
+
   return (
-    <Image src="/assets/avatar.png" width={size} height={size} alt={str} />
+    <Image
+      src={src}
+      width={size}
+      height={size}
+      alt={str}
+      onError={() => setSrc('/assets/avatar.png')}
+    />
   )
 }

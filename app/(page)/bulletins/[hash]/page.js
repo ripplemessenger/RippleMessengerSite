@@ -38,6 +38,14 @@ export default async function Page(props) {
     files = json.File
   }
 
+  // Split attachments by type for the main media display.
+  const IMG_EXT = /^(jpg|jpeg|png|gif|webp|svg|bmp)$/i
+  const VID_EXT = /^(mp4|webm|mov|m4v)$/i
+  const AUD_EXT = /^(mp3|ogg|oga|opus|wav|m4a|aac|flac)$/i
+  const images = files.filter((f) => IMG_EXT.test(f.Ext))
+  const videos = files.filter((f) => VID_EXT.test(f.Ext))
+  const audios = files.filter((f) => AUD_EXT.test(f.Ext))
+
   // let pk = JSON.parse(bulletin.json).PublicKey
   // let qr_json = {
   //   "Relay": process.env.BASE_URL,
@@ -91,16 +99,61 @@ export default async function Page(props) {
               </div> : <></>
           }
           {
+            // Files: show the list but guide users to the Client for downloading.
             files.length > 0 ?
-              <div className="flex flex-wrap">
-                File: {files.map((file) => (
-                  <div className="inline" key={file.Hash}>
-                    <Link href={`#`} className='font-bold bg-gray-500 rounded-md px-1'>{file.Name}{file.Ext}({file.Size})</Link>
-                  </div>
-                ))}
+              <div className="flex flex-col gap-1">
+                <div className="flex flex-wrap">
+                  File: {files.map((file) => (
+                    <div className="inline" key={file.Hash}>
+                      <span className='font-bold bg-gray-300 rounded-md px-1'>{file.Name || 'unnamed'}.{file.Ext || ''} ({file.Size != null ? file.Size : '?'})</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="text-sm text-gray-500">
+                  请使用 <Link href={`https://github.com/ripplemessenger/RippleMessengerClient/releases`} className="font-bold text-blue-500 hover:underline">RippleMessenger Client</Link> 下载文件
+                </div>
               </div> : <></>
           }
           <hr />
+          {videos.length > 0 && (
+            <div className="mb-4">
+              {videos.map((file) => (
+                <video
+                  key={file.Hash}
+                  controls
+                  className="max-w-full rounded-lg"
+                  src={`/file/${file.Hash}`}
+                  poster={images.length > 0 ? `/file/${images[0].Hash}` : undefined}
+                />
+              ))}
+            </div>
+          )}
+          {audios.length > 0 && (
+            <div className="mb-4 flex flex-col gap-2">
+              {audios.map((file) => (
+                <audio
+                  key={file.Hash}
+                  controls
+                  className="w-full"
+                  src={`/file/${file.Hash}`}
+                  preload="metadata"
+                />
+              ))}
+            </div>
+          )}
+          {images.length > 0 && (
+            <div className="mb-4 flex flex-wrap gap-2">
+              {images.map((file) => (
+                <img
+                  key={file.Hash}
+                  src={`/file/${file.Hash}`}
+                  alt={file.Name}
+                  className="max-w-full max-h-96 rounded-lg"
+                  loading="lazy"
+                />
+              ))}
+            </div>
+          )}
           <div dangerouslySetInnerHTML={{ __html: bulletin.content.replace(/\n/g, "<br>") }} className="break-all"></div>
         </div>
         <div className="flex flex-col">
