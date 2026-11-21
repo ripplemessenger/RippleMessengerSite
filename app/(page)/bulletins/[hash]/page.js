@@ -105,7 +105,7 @@ export default async function Page(props) {
                 <div className="flex flex-wrap">
                   File: {files.map((file) => (
                     <div className="inline" key={file.Hash}>
-                      <span className='font-bold bg-gray-300 rounded-md px-1'>{file.Name || 'unnamed'}.{file.Ext || ''} ({file.Size != null ? file.Size : '?'})</span>
+                      <span className='font-bold bg-gray-300 rounded-md px-1'>{file.Name || 'unnamed'}{file.Ext ? `.${file.Ext}` : ''} ({file.Size != null ? file.Size : '?'})</span>
                     </div>
                   ))}
                 </div>
